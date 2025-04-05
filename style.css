@@ -2,3 +2,8 @@
 body,h1,h2,h3,h4,h5,h6,p,a{
     font-family: "Roboto", sans-serif;
 }
+
+.active{
+    border-radius: 55px;
+    background-color: #0e79811f;
+}

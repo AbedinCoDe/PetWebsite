@@ -5,17 +5,42 @@ const fetchCategory = async () => {
     const res = await fetch(url)
     const data = await res.json()
     displayCategory(data.categories)
+    
 }
 
 
+const clearButtonStyle = () => {
+    const clearButton = document.getElementsByClassName('btn_Active_Style');
+    for(let btn of clearButton){
+        btn.classList.remove('active');
+    }
+}
+
+
+const likedPet = async (categoryName, id) => {
+
+    fetch(`https://openapi.programming-hero.com/api/peddy/category/${categoryName}`)
+    .then((res) => res.json())
+    .then(data => {
+        clearButtonStyle();
+        const activeButton = document.getElementById(`btn-${id}`)
+        activeButton.classList.add('active');
+
+        displayPetCategory(data.data)
+    })
+}
+
+ 
+
 const displayCategory = (data) => {
     const getPetCategory = document.querySelector('.petCategory');
-
+    // console.log(data)
     data.forEach(element => {
         const newHtml = document.createElement('div');
+        
         newHtml.innerHTML = `
             <div class="mb-10">
-                <button class="flex justify-center items-center gap-5 border border-[#0e798154] px-14 py-7 cursor-pointer">
+                <button id="btn-${element.id}" onclick="likedPet('${element.category}', ${element.id})" class="flex justify-center items-center gap-5 border border-[#0e798154] px-14 py-7 cursor-pointer btn_Active_Style">
                     <img class="w-12 h-12" src=${element.category_icon} > 
                     <h2 class="text-2xl">${element.category}</h2>
                 </button>
@@ -31,9 +56,21 @@ const fetchPetCategory = async () => {
     const url = "https://openapi.programming-hero.com/api/peddy/pets"
     const res = await fetch(url)
     const data = await res.json()
+    
     displayPetCategory(data.pets)
 }
 
+const sortedFunction = async() => {
+    const url = "https://openapi.programming-hero.com/api/peddy/pets"
+    const res = await fetch(url)
+    const data = await res.json()
+
+    const getDataByPrice = data.pets;
+    
+    let sortedPets = getDataByPrice.sort((a, b) => b.price - a.price )
+
+    displayPetCategory(sortedPets)
+}
 
 const fetchPetDetails = async (id) => {
     const url = `https://openapi.programming-hero.com/api/peddy/pet/${id}`
@@ -45,7 +82,6 @@ const fetchPetDetails = async (id) => {
 
 const loadPetDetails = (element) => {
     const getModalBody = document.querySelector('.modal-box');
-    console.log(element)
     getModalBody.innerHTML = `
         <div>
             <figure>
@@ -93,8 +129,43 @@ const loadPetDetails = (element) => {
 
 
 
+const addToGalary = (img) => {
+    const getGalaryBody = document.querySelector('.likedItem');
+    const newHtml = document.createElement('div');
+    newHtml.innerHTML += `
+        <div class="">
+            <img class="w-40 h-40 object-cover rounded-xl" src=${img}>
+        </div>
+    `
+    getGalaryBody.appendChild(newHtml);
+}
+
+const adopted = (btn) => {
+    btn.innerText = "Adopted";
+    btn.style.backgroundColor = "green";
+    btn.style.color = "white";
+}
+
+
+
 const displayPetCategory = (element) => {
     const getCategoryitemContainer = document.querySelector('.categoryItem');
+    getCategoryitemContainer.innerHTML = "";
+
+    if(element.length === 0){
+        getCategoryitemContainer.innerHTML = `
+            <div class="w-11/12 flex flex-col gap-5 p-20 text-center justify-center items-center mx-auto">
+                <img src="images/error.webp">
+                <h2 class="text-2xl font-bold">No Information Available</h2>
+                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at 
+                its layout. The point of using Lorem Ipsum is that it has a.</p>
+            </div>
+        `
+        getCategoryitemContainer.classList.remove('grid');
+    }else{
+        getCategoryitemContainer.classList.add('grid');
+    }
+
     element.forEach((element) => {
         const createDiv = document.createElement('div');
         createDiv.innerHTML = `
@@ -119,10 +190,10 @@ const displayPetCategory = (element) => {
                             src="https://img.icons8.com/?size=100&id=m0I9X3xiNNU1&format=png&color=000000"
                             alt="">Price: ${element.price}</span>
                     <div class="card-actions justify-between mt-3">
-                        <button class="btn bg-white"><img class="w-7"
+                        <button onclick="addToGalary('${element.image}')" class="btn bg-white"><img class="w-7"
                                 src="https://img.icons8.com/?size=100&id=114150&format=png&color=000000"
                                 alt=""></button>
-                        <button class="btn text-[#0E7A81]">Adopt</button>
+                        <button id="adopted" onclick="adopted(this)" class="btn text-[#0E7A81]">Adopt</button>
                         <button onclick="fetchPetDetails(${element.petId})" class="btn text-[#0E7A81]">Details</button>
                     </div>
                 </div>
