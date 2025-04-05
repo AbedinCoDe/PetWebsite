@@ -61,15 +61,25 @@ const fetchPetCategory = async () => {
 }
 
 const sortedFunction = async() => {
-    const url = "https://openapi.programming-hero.com/api/peddy/pets"
-    const res = await fetch(url)
-    const data = await res.json()
-
-    const getDataByPrice = data.pets;
+    const spinner = document.getElementById('overlay-spinner');
+    spinner.classList.remove('hidden');
     
-    let sortedPets = getDataByPrice.sort((a, b) => b.price - a.price )
+    try{
+        const url = "https://openapi.programming-hero.com/api/peddy/pets"
+        const res = await fetch(url)
+        const data = await res.json()
 
-    displayPetCategory(sortedPets)
+        const getDataByPrice = data.pets;
+        
+        let sortedPets = getDataByPrice.sort((a, b) => b.price - a.price )
+
+        displayPetCategory(sortedPets)
+        
+    }catch(err){
+        console.error("Error Fetching Pets: ", err);
+    }finally{
+        spinner.classList.add('hidden');
+    }
 }
 
 const fetchPetDetails = async (id) => {
@@ -179,16 +189,16 @@ const displayPetCategory = (element) => {
                     <h2 class="card-title">${element.pet_name}</h2>
                     <span class="flex items-center"><img class="w-6 mr-2"
                             src="https://img.icons8.com/?size=100&id=41162&format=png&color=000000"
-                            alt="">Breed: ${element.breed}</span>
+                            alt="">Breed: ${element.breed === undefined ? `No Breed` : `${element.breed}`}</span>
                     <span class="flex items-center"><img class="w-6 mr-2"
                             src="https://img.icons8.com/?size=100&id=O4nOoRjqFf8k&format=png&color=000000"
-                            alt="">Birth: ${element.date_of_birth} </span>
+                            alt="">Birth: ${element.date_of_birth === null ? `No Birth Date` : `${element.date_of_birth}`} </span>
                     <span class="flex items-center"><img class="w-6 mr-2"
                             src="https://img.icons8.com/?size=100&id=d7ShKrOXVPLz&format=png&color=000000"
                             alt="">Gender: ${element.gender}</span>
                     <span class="flex items-center"><img class="w-6 mr-2"
                             src="https://img.icons8.com/?size=100&id=m0I9X3xiNNU1&format=png&color=000000"
-                            alt="">Price: ${element.price}</span>
+                            alt="">Price: ${element.price === null ? `No Price` : `${element.price}`}</span>
                     <div class="card-actions justify-between mt-3">
                         <button onclick="addToGalary('${element.image}')" class="btn bg-white"><img class="w-7"
                                 src="https://img.icons8.com/?size=100&id=114150&format=png&color=000000"
